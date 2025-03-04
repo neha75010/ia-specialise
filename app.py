@@ -1,37 +1,20 @@
+import numpy as np
+from PIL import Image
 import cv2
-# charger l'image
-image = cv2.imread('./image.jpg')
-# Afficher l'image
-cv2.imshow('Image', image) 
-cv2.waitKey(0) 
-cv2.destroyAllWindows()
+# TensorFlow and tf.keras
+from tensorflow.keras.applications.imagenet_utils import preprocess_input, decode_predictions
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2
 
-# Convertir en niveaux de gris
-gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-# Sauvegarder
-cv2.imwrite('gray_image.jpg', gray_image)
-# Afficher l'image
-cv2.imshow('Grayscale Image', gray_image) 
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-
-# Redimensionner à une taille fixe
-resized_image = cv2.resize(image, (200, 200))
-# Redimensionner en maintenant le ratio
-height, width = image.shape[:2]
-new_width = 300
-new_height = int((new_width / width) * height) 
-resized_aspect_image = cv2.resize(image, (new_width, new_height))
-# Afficher l'image
-cv2.imshow('Resized Image', resized_image) 
-cv2.waitKey(0)
-cv2.destroyAllWindows()
-
-# Normalisation entre 0 et 1
-normalized_image = image / 255.0
-# Normalisation à une plage personnalisée
-norm_image = cv2.normalize(image, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)
-# Afficher l'image
-cv2.imshow('Normalized Image', norm_image) 
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# Modèle ImageNet
+model = MobileNetV2(weights='imagenet')
+img = Image.open("./image.jpg")
+ 
+# Fonction de prédiction
+def model_predict(img, model):
+   img = img.resize((224, 224))
+   x = image.img_to_array(img)
+   x = np.expand_dims(x, axis=0)
+   x = preprocess_input(x, mode='tf')
+   preds = model.predict(x)
+   return preds
